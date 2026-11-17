@@ -1,10 +1,23 @@
 <!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Monitor de FIIs</title>
-<style>:root{--bg:#f2f4f7;--surface:#fff;--ink:#15202b;--muted:#566573;--line:#d4dae1;--accent:#2b4fa3}
-@media (prefers-color-scheme: dark){:root{--bg:#10161d;--surface:#18212b;--ink:#e7edf3;--muted:#9aa9b8;--line:#2d3a47;--accent:#8fb0f5;color-scheme:dark}}
+<style>:root{--ap:#a86f00;--ap-soft:#faefd2;--bg:#f2f4f7;--surface:#fff;--ink:#15202b;--muted:#566573;--line:#d4dae1;--accent:#2b4fa3}
+@media (prefers-color-scheme: dark){:root{--bg:#10161d;--surface:#18212b;--ink:#e7edf3;--muted:#9aa9b8;--line:#2d3a47;--accent:#8fb0f5;--ap:#e8b64f;--ap-soft:#3a2e10;color-scheme:dark}}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",system-ui,sans-serif}main{max-width:760px;margin:0 auto;padding:40px 18px;display:flex;flex-direction:column;gap:18px}
-h1{margin:0;font-size:2rem}a.card{display:block;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;color:var(--ink);text-decoration:none}a.card:hover{border-color:var(--accent)}a.card b{color:var(--accent)}p{margin:0}.muted{color:var(--muted);font-size:.9rem}</style></head>
-<body><main><h1>Monitor de fundos imobiliários</h1><p>Atualizado automaticamente com dados públicos da CVM e cotações de mercado.</p>
+h1{margin:0;font-size:2rem}a.card{display:block;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;color:var(--ink);text-decoration:none}a.card:hover{border-color:var(--accent)}a.card b{color:var(--accent)}p{margin:0}.muted{color:var(--muted);font-size:.9rem}
+.aviso{background:var(--ap-soft);border-left:4px solid var(--ap);color:var(--ink);padding:10px 14px;border-radius:8px;font-size:.92rem;max-width:90ch}
+.aviso-legal{display:flex;flex-direction:column;border:1px solid var(--line);border-left:4px solid var(--ap);background:var(--surface);border-radius:10px;padding:16px 18px;gap:10px}
+.aviso-legal p{max-width:90ch;font-size:.93rem}
+.gloss dl{margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px 28px}
+.gloss .gl-item{display:flex;flex-direction:column;gap:2px;break-inside:avoid}
+.gloss dt{font-weight:600} .gloss dd{margin:0;font-size:.93rem;color:var(--muted)}
+.gloss input{padding:6px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;min-width:240px}
+</style></head>
+<body><main><h1>Monitor de fundos imobiliários</h1><p class="aviso"><strong>Material pessoal, sem validação.</strong> Painel gerado com inteligência artificial a partir de dados públicos; as informações não foram conferidas por pessoa. Não é recomendação de investimento e não deve ser usado para decidir investimentos.</p><p>Atualizado automaticamente com dados públicos da CVM e cotações de mercado.</p>
 <a class="card" href="ranking/"><b>Ranking dos fundos</b><p>Tabela com nota, indicadores, filtros e os 20 melhores pela nota.</p></a>
 <a class="card" href="mapa/"><b>Mapa dos imóveis</b><p>Onde estão os imóveis dos fundos de tijolo, com vacância, inadimplência e aluguel por m².</p></a>
-<p class="muted">Informativo. Não é recomendação de investimento.</p></main></body></html>
+<section class="aviso-legal" aria-labelledby="h-aviso">
+  <h2 style="margin:0;font-size:1.2rem" id="h-aviso">Aviso</h2>
+  <p>Este painel é um material de uso pessoal, criado com auxílio de inteligência artificial a partir de dados públicos (CVM, mFinance, Investidor10 e relatórios de consultorias imobiliárias). As informações, os cálculos, as notas e as classificações não foram validados por pessoa nem por profissional habilitado e podem conter erros, atrasos ou omissões.</p>
+  <p>Nada aqui constitui recomendação, oferta, relatório de análise (Resolução CVM nº 20/2021) ou consultoria de valores mobiliários (Resolução CVM nº 19/2021), e o conteúdo não deve ser utilizado como base para decisões de investimento. O proprietário não se responsabiliza pelas informações nem por perdas ou danos decorrentes do seu uso.</p>
+  <p>Antes de investir, consulte os documentos oficiais de cada fundo (regulamento, informes e relatórios gerenciais) e, se necessário, um profissional habilitado.</p>
+</section></main></body></html>

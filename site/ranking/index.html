@@ -85,11 +85,20 @@ ul.plain{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
 .err{background:var(--du-soft);color:var(--du);padding:12px 14px;border-radius:8px}
 @media (max-width:700px){ .tcard{grid-template-columns:auto 1fr auto} th,td{padding:6px 7px} }
 @media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+
+.aviso{background:var(--ap-soft);border-left:4px solid var(--ap);color:var(--ink);padding:10px 14px;border-radius:8px;font-size:.92rem;max-width:90ch}
+.aviso-legal{display:flex;flex-direction:column;border:1px solid var(--line);border-left:4px solid var(--ap);background:var(--surface);border-radius:10px;padding:16px 18px;gap:10px}
+.aviso-legal p{max-width:90ch;font-size:.93rem}
+.gloss dl{margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px 28px}
+.gloss .gl-item{display:flex;flex-direction:column;gap:2px;break-inside:avoid}
+.gloss dt{font-weight:600} .gloss dd{margin:0;font-size:.93rem;color:var(--muted)}
+.gloss input{padding:6px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;min-width:240px}
 </style>
 </head>
 <body>
 <main>
 <header style="display:flex;flex-direction:column;gap:10px">
+  <p class="aviso"><strong>Material pessoal, sem validação.</strong> Painel gerado com inteligência artificial a partir de dados públicos; as informações não foram conferidas por pessoa. Não é recomendação de investimento e não deve ser usado para decidir investimentos.</p>
   <p class="small muted" id="stamp">Carregando dados…</p>
   <h1>Ranking dos fundos imobiliários</h1>
   <p class="narrow" id="lead"></p>
@@ -139,6 +148,67 @@ ul.plain{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
     <li><strong>Fontes.</strong> CVM, dados abertos (informes mensais e trimestrais dos FIIs); cotações e dividendos: mFinance, com Investidor10 para os fundos que ele não cobre. Referências de aluguel: Cushman &amp; Wakefield e JLL.</li>
     <li><strong>Limites.</strong> O ranking olha o passado recente e dados contábeis. Não mede gestão, qualidade dos inquilinos ou do crédito, nem eventos posteriores ao último informe. Fundos recém-reorganizados podem ficar de fora por falta de cotação.</li>
   </ul>
+</section>
+<section class="gloss" aria-labelledby="h-gloss">
+  <h2 id="h-gloss">Glossário</h2>
+  <p class="small muted">Siglas e conceitos usados nesta página, em linguagem simples.</p>
+  <div><label for="gl-busca" class="small" style="font-weight:600">Procurar termo </label><input type="search" id="gl-busca" placeholder="Ex.: P/VP, vacância, CRI"></div>
+  <dl id="gl-lista">
+    <div class="gl-item"><dt>Alertas</dt><dd>Sinais automáticos de atenção calculados pelo painel, como dividendo maior que o resultado, desconto extremo, vacância alta ou concentração em um único imóvel.</dd></div>
+    <div class="gl-item"><dt>Aluguel médio por m²</dt><dd>Receita de aluguel por mês dividida pela área ocupada. Estimativa do painel.</dd></div>
+    <div class="gl-item"><dt>Área</dt><dd>Área dos imóveis do fundo, em metros quadrados, conforme informada à CVM.</dd></div>
+    <div class="gl-item"><dt>B3</dt><dd>A bolsa de valores do Brasil, onde as cotas dos fundos imobiliários são compradas e vendidas.</dd></div>
+    <div class="gl-item"><dt>Caixa / ativo</dt><dd>Parte do patrimônio que está em dinheiro ou aplicações de curto prazo.</dd></div>
+    <div class="gl-item"><dt>Cap rate</dt><dd>Renda anual de aluguel dividida pelo valor do imóvel. Mostra quanto o imóvel rende por ano. Exemplo: R$ 8 mil de aluguel por ano em um imóvel de R$ 100 mil dá cap rate de 8%.</dd></div>
+    <div class="gl-item"><dt>Cap rate a preço de mercado</dt><dd>O mesmo cálculo, mas sobre o valor que a bolsa paga hoje pelos imóveis: valor de todas as cotas mais as dívidas, menos caixa e títulos. Se for maior que o contábil, a bolsa está pagando menos do que diz o laudo.</dd></div>
+    <div class="gl-item"><dt>Cap rate contábil</dt><dd>Cap rate calculado sobre o valor dos imóveis registrado no balanço do fundo, que vem do laudo de avaliação. Quanto menor, mais &quot;caro&quot; é o valor atribuído aos imóveis em relação ao aluguel que geram.</dd></div>
+    <div class="gl-item"><dt>CDI</dt><dd>Taxa de juros que os bancos cobram entre si, quase igual à Selic. É a referência de rendimento da renda fixa.</dd></div>
+    <div class="gl-item"><dt>Cobertura pelo resultado</dt><dd>Quanto do dividendo pago nos últimos quatro trimestres foi gerado pelo resultado do fundo. Abaixo de 100%, o fundo pagou mais do que gerou e usou reservas, o que não se sustenta por muito tempo.</dd></div>
+    <div class="gl-item"><dt>Concentração (maior imóvel ou maior CRI)</dt><dd>Peso do maior ativo na receita ou na carteira. Quanto maior, mais o fundo depende de um só imóvel, inquilino ou devedor.</dd></div>
+    <div class="gl-item"><dt>Cota</dt><dd>A menor fração de um fundo. É o que o investidor compra e vende na bolsa.</dd></div>
+    <div class="gl-item"><dt>Cotação</dt><dd>Preço de uma cota na bolsa.</dd></div>
+    <div class="gl-item"><dt>Cotistas</dt><dd>Número de pessoas e empresas que têm cotas do fundo.</dd></div>
+    <div class="gl-item"><dt>CRI</dt><dd>Certificado de Recebíveis Imobiliários: um título de dívida ligado ao setor imobiliário, como o financiamento de uma obra ou de um imóvel. É o principal investimento dos fundos de papel.</dd></div>
+    <div class="gl-item"><dt>CVM</dt><dd>Comissão de Valores Mobiliários, o órgão do governo que regula e fiscaliza os fundos. Publica os informes usados neste painel.</dd></div>
+    <div class="gl-item"><dt>Distância da máxima de 12 meses</dt><dd>Quanto a cotação atual está abaixo do maior preço do último ano.</dd></div>
+    <div class="gl-item"><dt>Dívida / patrimônio</dt><dd>Valores que o fundo deve por compra de imóveis a prazo e por títulos que emitiu, em relação ao patrimônio.</dd></div>
+    <div class="gl-item"><dt>Dividendo (rendimento)</dt><dd>Valor que o fundo distribui ao cotista, em geral todo mês, vindo dos aluguéis ou dos juros que recebe. Para pessoa física costuma ser isento de imposto de renda, desde que cumpridas as regras da lei.</dd></div>
+    <div class="gl-item"><dt>DY (dividend yield)</dt><dd>Dividendos pagos em 12 meses divididos pela cotação. Exemplo: se o fundo pagou R$ 12 por cota no ano e a cota custa R$ 100, o DY é 12%. Mostra o passado, não garante o futuro.</dd></div>
+    <div class="gl-item"><dt>Elegível ao Top 20</dt><dd>Fundo que cumpre os mínimos do painel: liquidez de R$ 1,5 milhão por dia, 15 mil cotistas, P/VP acima de 0,55, DY até 20% e dividendo coberto em pelo menos 85% pelo resultado.</dd></div>
+    <div class="gl-item"><dt>Fiagro</dt><dd>Fundo do agronegócio, parecido com o FII. Fica fora deste painel.</dd></div>
+    <div class="gl-item"><dt>FII (fundo imobiliário)</dt><dd>Fundo que junta o dinheiro de muitos investidores para comprar imóveis ou títulos ligados a imóveis, e repassa a renda a eles.</dd></div>
+    <div class="gl-item"><dt>Fundo de fundos (FoF)</dt><dd>Fundo imobiliário que investe em cotas de outros fundos imobiliários.</dd></div>
+    <div class="gl-item"><dt>Híbrido</dt><dd>Fundo que mistura imóveis, crédito imobiliário e outros ativos, sem predominância clara de um tipo.</dd></div>
+    <div class="gl-item"><dt>IFIX</dt><dd>Índice da B3 que reúne os principais fundos imobiliários. Funciona como termômetro do mercado.</dd></div>
+    <div class="gl-item"><dt>Inadimplência</dt><dd>Parte do aluguel que deveria ter sido paga e não foi paga no prazo.</dd></div>
+    <div class="gl-item"><dt>Informe mensal e trimestral</dt><dd>Relatórios obrigatórios que cada fundo entrega à CVM, com patrimônio, cotistas, imóveis, receitas e dividendos. São a principal fonte deste painel.</dd></div>
+    <div class="gl-item"><dt>IPCA</dt><dd>Índice oficial de inflação do Brasil. Corrige a maior parte dos contratos de aluguel e muitos CRIs.</dd></div>
+    <div class="gl-item"><dt>Laudo de avaliação</dt><dd>Estimativa do valor de um imóvel feita por uma empresa avaliadora. É a base do valor contábil dos imóveis no balanço do fundo.</dd></div>
+    <div class="gl-item"><dt>Liquidez diária</dt><dd>Valor médio negociado por dia na bolsa. Quanto maior, mais fácil comprar ou vender cotas sem mexer muito no preço.</dd></div>
+    <div class="gl-item"><dt>Master/feeder (via outro FII)</dt><dd>Estrutura em que o fundo investe em outro fundo (o &quot;master&quot;), que é quem detém os imóveis ou o crédito.</dd></div>
+    <div class="gl-item"><dt>Nota (0 a 100)</dt><dd>Pontuação criada por este painel, somando cinco critérios: preço (25), renda (25), qualidade (30), liquidez (10) e custo (10). É uma regra automática, não uma opinião profissional.</dd></div>
+    <div class="gl-item"><dt>NTN-B (Tesouro IPCA+)</dt><dd>Título público que paga a inflação mais uma taxa de juros. É a referência de juro &quot;real&quot; usada para comparar com a renda dos fundos.</dd></div>
+    <div class="gl-item"><dt>Papel</dt><dd>Fundo que investe principalmente em CRIs, ou seja, em crédito imobiliário, e não em imóveis.</dd></div>
+    <div class="gl-item"><dt>Passivo / ativo</dt><dd>Tudo o que o fundo deve dividido por tudo o que ele tem. Mostra o grau de endividamento (alavancagem).</dd></div>
+    <div class="gl-item"><dt>Patrimônio líquido (PL)</dt><dd>Valor de tudo o que o fundo tem, menos o que ele deve.</dd></div>
+    <div class="gl-item"><dt>P/VP</dt><dd>Cotação dividida pelo valor patrimonial por cota. Abaixo de 1, a bolsa paga menos do que o patrimônio (desconto); acima de 1, paga mais (ágio). Exemplo: P/VP de 0,80 significa pagar R$ 0,80 por R$ 1,00 de patrimônio.</dd></div>
+    <div class="gl-item"><dt>Selic</dt><dd>Taxa básica de juros da economia, definida pelo Banco Central.</dd></div>
+    <div class="gl-item"><dt>Taxa de administração</dt><dd>Remuneração do administrador e do gestor, descontada do patrimônio do fundo. Reduz a renda que chega ao cotista.</dd></div>
+    <div class="gl-item"><dt>Ticker</dt><dd>Código de negociação do fundo na bolsa, como HGLG11. Os fundos imobiliários costumam terminar em 11.</dd></div>
+    <div class="gl-item"><dt>Tijolo</dt><dd>Fundo que é dono de imóveis (galpões, escritórios, shoppings, lojas) e vive principalmente de aluguel.</dd></div>
+    <div class="gl-item"><dt>Vacância física</dt><dd>Parte da área dos imóveis que está vazia, sem inquilino.</dd></div>
+    <div class="gl-item"><dt>Valor patrimonial por cota (VP)</dt><dd>Patrimônio líquido do fundo dividido pelo número de cotas. É quanto &quot;vale&quot; cada cota pelo balanço.</dd></div>
+  </dl>
+  <script>
+  (function(){const n=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();const i=document.getElementById('gl-busca');
+  i.addEventListener('input',()=>{const q=n(i.value.trim());document.querySelectorAll('#gl-lista .gl-item').forEach(el=>{el.hidden=q&&!n(el.textContent).includes(q);});});})();
+  </script>
+</section>
+<section class="aviso-legal" aria-labelledby="h-aviso">
+  <h2 id="h-aviso">Aviso</h2>
+  <p>Este painel é um material de uso pessoal, criado com auxílio de inteligência artificial a partir de dados públicos (CVM, mFinance, Investidor10 e relatórios de consultorias imobiliárias). As informações, os cálculos, as notas e as classificações não foram validados por pessoa nem por profissional habilitado e podem conter erros, atrasos ou omissões.</p>
+  <p>Nada aqui constitui recomendação, oferta, relatório de análise (Resolução CVM nº 20/2021) ou consultoria de valores mobiliários (Resolução CVM nº 19/2021), e o conteúdo não deve ser utilizado como base para decisões de investimento. O proprietário não se responsabiliza pelas informações nem por perdas ou danos decorrentes do seu uso.</p>
+  <p>Antes de investir, consulte os documentos oficiais de cada fundo (regulamento, informes e relatórios gerenciais) e, se necessário, um profissional habilitado.</p>
 </section>
 </main>
 

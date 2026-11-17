@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: '37 11 * * 6'   # todo sábado 08:37 de Brasília; só roda de fato entre os dias 8 e 14
   workflow_dispatch: {}
+  push:                     # republica o site quando as páginas mudam (sem baixar dados de novo)
+    branches: [main]
+    paths: ['site/**', '!site/data/**']
 
 permissions:
   contents: write
@@ -21,7 +24,7 @@ jobs:
         id: prep
         run: |
           d=$(TZ=America/Sao_Paulo date +%d)
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || { [ "$d" -ge 8 ] && [ "$d" -le 14 ]; }; then rodar=sim; else rodar=nao; fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || { [ "${{ github.event_name }}" = "schedule" ] && [ "$d" -ge 8 ] && [ "$d" -le 14 ]; }; then rodar=sim; else rodar=nao; fi
           # funciona com os arquivos na raiz do repositório ou dentro da pasta fii-monitor
           if [ -f pipeline/build_data.py ]; then base=.; else base=$(dirname "$(dirname "$(find . -path '*/pipeline/build_data.py' | head -1)")"); fi
           echo "rodar=$rodar" >> "$GITHUB_OUTPUT"
@@ -50,12 +53,12 @@ jobs:
           git push
 
       - uses: actions/configure-pages@v5
-        if: steps.prep.outputs.rodar == 'sim'
+        if: steps.prep.outputs.rodar == 'sim' || github.event_name == 'push'
 
       - uses: actions/upload-pages-artifact@v3
-        if: steps.prep.outputs.rodar == 'sim'
+        if: steps.prep.outputs.rodar == 'sim' || github.event_name == 'push'
         with:
           path: ${{ steps.prep.outputs.base }}/site
 
       - uses: actions/deploy-pages@v4
-        if: steps.prep.outputs.rodar == 'sim'
+        if: steps.prep.outputs.rodar == 'sim' || github.event_name == 'push'

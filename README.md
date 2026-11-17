@@ -5,7 +5,7 @@ Ranking dos FIIs e mapa dos imóveis, atualizados sozinhos no segundo sábado de
 - **CVM, dados abertos**: informes mensais e trimestrais dos FIIs (patrimônio, cotistas, imóveis, vacância, inadimplência, receita de aluguel, dividendos declarados).
 - **Cotações e dividendos**: mFinance; Investidor10 e Yahoo Finance para os fundos que o mFinance não cobre.
 
-Nada aqui é recomendação de investimento.
+> **Aviso.** Material de uso pessoal, criado com auxílio de inteligência artificial a partir de dados públicos. As informações, os cálculos e as classificações não foram validados por pessoa nem por profissional habilitado e podem conter erros. Não é recomendação, relatório de análise (Resolução CVM nº 20/2021) nem consultoria de valores mobiliários (Resolução CVM nº 19/2021), e não deve ser usado como base para decisões de investimento. O proprietário não se responsabiliza pelas informações nem por perdas decorrentes do seu uso.
 
 ## Como colocar no ar (uma vez só)
 
