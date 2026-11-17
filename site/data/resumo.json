@@ -2,21 +2,21 @@
  "gerado": "2026-11-17",
  "cvm_mensal": "2026-10-01",
  "cvm_trimestral": "2026-09-30",
- "n": 88,
+ "n": 89,
  "top20": [
   {
    "t": "RBVA11",
    "nota": 89.6,
    "tipo": "Tijolo",
-   "dy": 13.79,
-   "pvp": 0.737
+   "dy": 13.83,
+   "pvp": 0.736
   },
   {
    "t": "HFOF11",
-   "nota": 87.8,
+   "nota": 88.1,
    "tipo": "Fundo de fundos",
-   "dy": 12.62,
-   "pvp": 0.763
+   "dy": 12.68,
+   "pvp": 0.759
   },
   {
    "t": "JSAF11",
@@ -27,31 +27,24 @@
   },
   {
    "t": "RECR11",
-   "nota": 84.4,
+   "nota": 84.2,
    "tipo": "Papel",
-   "dy": 15.85,
-   "pvp": 0.781
+   "dy": 15.94,
+   "pvp": 0.777
   },
   {
    "t": "KORE11",
    "nota": 83.8,
    "tipo": "Tijolo",
-   "dy": 15.49,
-   "pvp": 0.589
+   "dy": 15.45,
+   "pvp": 0.591
   },
   {
    "t": "HSLG11",
    "nota": 83.7,
    "tipo": "Tijolo",
-   "dy": 12.15,
-   "pvp": 0.649
-  },
-  {
-   "t": "JSRE11",
-   "nota": 83.2,
-   "tipo": "Tijolo",
-   "dy": 10.17,
-   "pvp": 0.561
+   "dy": 12.21,
+   "pvp": 0.646
   },
   {
    "t": "IRIM11",
@@ -59,6 +52,13 @@
    "tipo": "Papel",
    "dy": 13.17,
    "pvp": 0.701
+  },
+  {
+   "t": "JSRE11",
+   "nota": 83.1,
+   "tipo": "Tijolo",
+   "dy": 10.11,
+   "pvp": 0.564
   },
   {
    "t": "CVBI11",
@@ -69,24 +69,24 @@
   },
   {
    "t": "VRTA11",
-   "nota": 80.8,
+   "nota": 80.9,
    "tipo": "Papel",
-   "dy": 15.45,
-   "pvp": 0.794
+   "dy": 15.44,
+   "pvp": 0.795
   },
   {
    "t": "HGRE11",
-   "nota": 80.2,
+   "nota": 80.1,
    "tipo": "Tijolo",
    "dy": 10.28,
-   "pvp": 0.742
+   "pvp": 0.743
   },
   {
    "t": "HGBS11",
-   "nota": 78.5,
+   "nota": 78.2,
    "tipo": "Tijolo",
-   "dy": 11.05,
-   "pvp": 0.852
+   "dy": 11.01,
+   "pvp": 0.855
   },
   {
    "t": "RBRR11",
@@ -96,18 +96,18 @@
    "pvp": 0.677
   },
   {
-   "t": "VILG11",
-   "nota": 77.4,
-   "tipo": "Tijolo",
-   "dy": 10.76,
-   "pvp": 0.806
+   "t": "HGCR11",
+   "nota": 77.0,
+   "tipo": "Papel",
+   "dy": 13.62,
+   "pvp": 0.884
   },
   {
-   "t": "HGCR11",
-   "nota": 77.2,
-   "tipo": "Papel",
-   "dy": 13.66,
-   "pvp": 0.881
+   "t": "VILG11",
+   "nota": 76.9,
+   "tipo": "Tijolo",
+   "dy": 10.69,
+   "pvp": 0.811
   },
   {
    "t": "HGLG11",
@@ -117,6 +117,13 @@
    "pvp": 0.868
   },
   {
+   "t": "HGRU11",
+   "nota": 75.8,
+   "tipo": "Tijolo",
+   "dy": 10.39,
+   "pvp": 0.881
+  },
+  {
    "t": "KNHF11",
    "nota": 75.8,
    "tipo": "Papel",
@@ -124,25 +131,18 @@
    "pvp": 0.885
   },
   {
-   "t": "HGRU11",
-   "nota": 75.5,
-   "tipo": "Tijolo",
-   "dy": 10.36,
-   "pvp": 0.884
-  },
-  {
    "t": "KNIP11",
-   "nota": 75.2,
+   "nota": 75.5,
    "tipo": "Papel",
-   "dy": 11.63,
-   "pvp": 0.926
+   "dy": 11.65,
+   "pvp": 0.924
   },
   {
    "t": "CPSH11",
-   "nota": 75.1,
+   "nota": 74.9,
    "tipo": "Híbrido",
-   "dy": 15.86,
-   "pvp": 0.801
+   "dy": 15.81,
+   "pvp": 0.803
   }
  ],
  "faltando_preco": []
