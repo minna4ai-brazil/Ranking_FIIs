@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ranking dos fundos imobiliários</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: cabeçalho com data dos dados, Top 20 em destaque, tabela operável (filtros, grupos de colunas, ordenação), painel do fundo, metodologia. */
+:root{
+  --bg:#f2f4f7; --surface:#ffffff; --ink:#15202b; --muted:#566573; --line:#d4dae1;
+  --accent:#2b4fa3; --accent-soft:#e3e9f6; --gold:#8a6100; --gold-soft:#fbf1d9;
+  --ok:#1b7f55; --ok-soft:#dff2e8; --ap:#a86f00; --ap-soft:#faefd2; --du:#b93a30; --du-soft:#fae3e0;
+  --s1:#2b4fa3; --s2:#1b7f55; --s3:#7a4fb0; --s4:#b06a1f; --s5:#5d6b78;
+  --display:"Sora","Trebuchet MS",system-ui,sans-serif; --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ color-scheme:dark;
+    --bg:#10161d; --surface:#18212b; --ink:#e7edf3; --muted:#9aa9b8; --line:#2d3a47; --accent:#8fb0f5; --accent-soft:#1c2a45; --gold:#e8c46a; --gold-soft:#3a2f12;
+    --ok:#5fd09a; --ok-soft:#143326; --ap:#e8b64f; --ap-soft:#3a2e10; --du:#f28b80; --du-soft:#3f1d19;
+    --s1:#8fb0f5; --s2:#5fd09a; --s3:#c3a3f0; --s4:#efab66; --s5:#9aa9b8; }
+}
+:root[data-theme="dark"]{ color-scheme:dark;
+  --bg:#10161d; --surface:#18212b; --ink:#e7edf3; --muted:#9aa9b8; --line:#2d3a47; --accent:#8fb0f5; --accent-soft:#1c2a45; --gold:#e8c46a; --gold-soft:#3a2f12;
+  --ok:#5fd09a; --ok-soft:#143326; --ap:#e8b64f; --ap-soft:#3a2e10; --du:#f28b80; --du-soft:#3f1d19;
+  --s1:#8fb0f5; --s2:#5fd09a; --s3:#c3a3f0; --s4:#efab66; --s5:#9aa9b8; }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+main{max-width:1280px;margin:0 auto;padding:28px 18px 60px;display:flex;flex-direction:column;gap:34px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:clamp(1.6rem,4.5vw,2.3rem);letter-spacing:-.02em} h2{font-size:1.3rem} h3{font-size:1rem}
+p{margin:0} a{color:var(--accent)}
+section{display:flex;flex-direction:column;gap:14px}
+.narrow{max-width:76ch} .muted{color:var(--muted)} .small{font-size:.9rem}
+.pill{display:inline-flex;align-items:center;font-size:.78rem;font-weight:600;padding:1px 9px;border-radius:99px;white-space:nowrap;background:var(--accent-soft);color:var(--accent)}
+.pill.top{background:var(--gold-soft);color:var(--gold)} .pill.warn{background:var(--ap-soft);color:var(--ap)} .pill.bad{background:var(--du-soft);color:var(--du)}
+.topgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.tcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:baseline;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.tcard:hover{border-color:var(--accent)}
+.tcard .pos{font-family:var(--display);font-size:1.3rem;color:var(--gold);grid-row:span 2;font-variant-numeric:tabular-nums}
+.tcard .tk{font-family:var(--display);font-weight:700}
+.tcard .sc{font-variant-numeric:tabular-nums;font-weight:600}
+.tcard .sub{grid-column:2 / span 2;font-size:.82rem;color:var(--muted)}
+.mix{display:flex;flex-wrap:wrap;gap:8px}
+.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:.8rem;font-weight:600;color:var(--muted)}
+select,input,button{font:inherit}
+select,input[type=search],input[type=number]{padding:6px 9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+input[type=number]{width:96px}
+.chk{display:flex;gap:6px;align-items:center;font-size:.9rem}
+.btn{padding:5px 11px;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--ink);cursor:pointer;font-size:.86rem;font-weight:500}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.group{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface);max-height:72vh}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:.88rem}
+th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle;white-space:nowrap}
+thead th{position:sticky;top:0;background:var(--surface);font-size:.76rem;color:var(--muted);font-weight:600;z-index:2;vertical-align:bottom}
+thead tr.grp th{top:0;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--ink);border-bottom:2px solid var(--line);text-align:center}
+thead tr.col th{top:31px}
+th button{all:unset;cursor:pointer;white-space:normal;display:block;min-width:56px}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
+.stick{position:sticky;left:0;background:var(--surface);z-index:1}
+thead .stick{z-index:3}
+tr.row{cursor:pointer} tr.row:hover td{background:var(--accent-soft)} tr.row.sel td{background:var(--accent-soft)}
+tr.row.istop td.stick{box-shadow:inset 4px 0 0 var(--gold)}
+.tkcell{display:flex;flex-direction:column;line-height:1.25} .tkcell b{font-family:var(--display)} .tkcell span{font-size:.76rem;color:var(--muted);max-width:190px;overflow:hidden;text-overflow:ellipsis}
+.scorebar{display:flex;height:9px;width:110px;border-radius:5px;overflow:hidden;background:var(--line)}
+.scorebar i{display:block;height:100%}
+.good{color:var(--ok);font-weight:600} .mid{color:var(--ap);font-weight:600} .bad{color:var(--du);font-weight:600}
+.panel{position:fixed;top:0;right:0;height:100%;width:min(460px,100%);background:var(--surface);border-left:1px solid var(--line);box-shadow:-12px 0 30px rgba(0,0,0,.12);padding:20px;overflow:auto;transform:translateX(105%);transition:transform .25s;z-index:20;display:flex;flex-direction:column;gap:14px}
+.panel.open{transform:none}
+.panel dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:5px 12px;font-size:.92rem}
+.panel dt{color:var(--muted)} .panel dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar{display:grid;grid-template-columns:96px 1fr 84px;gap:8px;align-items:center;font-size:.88rem}
+.bar .track{height:10px;border-radius:5px;background:var(--line);overflow:hidden} .bar .fill{height:100%}
+.bar .val{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+ul.plain{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+.note{border-top:1px solid var(--line);padding-top:16px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.82rem;color:var(--muted)} .legend span{display:inline-flex;gap:5px;align-items:center} .legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.err{background:var(--du-soft);color:var(--du);padding:12px 14px;border-radius:8px}
+@media (max-width:700px){ .tcard{grid-template-columns:auto 1fr auto} th,td{padding:6px 7px} }
+@media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+</style>
+</head>
+<body>
+<main>
+<header style="display:flex;flex-direction:column;gap:10px">
+  <p class="small muted" id="stamp">Carregando dados…</p>
+  <h1>Ranking dos fundos imobiliários</h1>
+  <p class="narrow" id="lead"></p>
+  <p class="small"><a href="../mapa/" id="link-mapa">Ver o mapa dos imóveis</a></p>
+</header>
+
+<section aria-labelledby="h-top">
+  <h2 id="h-top">Os 20 melhores pela nota</h2>
+  <p class="narrow small" id="top-intro"></p>
+  <div class="mix" id="mix"></div>
+  <div class="topgrid" id="topgrid"></div>
+  <p class="narrow small muted">A nota ordena os fundos por critérios objetivos, iguais para todos. Não considera seus objetivos, prazo ou situação, e não é recomendação de compra. Antes de investir, leia os relatórios do fundo.</p>
+</section>
+
+<section aria-labelledby="h-tab">
+  <h2 id="h-tab">Todos os fundos analisados</h2>
+  <div class="controls" role="search">
+    <div class="field"><label for="q">Buscar</label><input type="search" id="q" placeholder="Ticker, nome ou gestora"></div>
+    <div class="field"><label for="ftipo">Tipo</label><select id="ftipo"><option value="">Todos</option></select></div>
+    <div class="field"><label for="fseg">Segmento</label><select id="fseg"><option value="">Todos</option></select></div>
+    <div class="field"><label for="fdy">DY mínimo (%)</label><input type="number" id="fdy" step="0.5" min="0"></div>
+    <div class="field"><label for="fpvp">P/VP máximo</label><input type="number" id="fpvp" step="0.05" min="0"></div>
+    <div class="field"><label for="fliq">Liquidez mín. (R$ mi/dia)</label><input type="number" id="fliq" step="0.5" min="0"></div>
+    <div class="field"><label for="fvac">Vacância máx. (%)</label><input type="number" id="fvac" step="1" min="0"></div>
+    <label class="chk"><input type="checkbox" id="ftop"> Só Top 20</label>
+    <label class="chk"><input type="checkbox" id="feleg"> Só elegíveis</label>
+    <label class="chk"><input type="checkbox" id="fsemal"> Sem alertas</label>
+    <button type="button" class="btn" id="limpar">Limpar filtros</button>
+  </div>
+  <div class="group" role="group" aria-label="Grupos de colunas visíveis" id="groups"></div>
+  <p class="small muted" id="count"></p>
+  <div class="tablewrap"><table id="tab"><thead></thead><tbody></tbody></table></div>
+  <div class="legend" id="legend"></div>
+  <p class="small muted narrow">Clique no título de uma coluna para ordenar e em uma linha para ver o detalhe do fundo. Fundos do Top 20 têm uma faixa dourada à esquerda.</p>
+</section>
+
+<section class="note" aria-labelledby="h-met">
+  <h2 id="h-met">Como a nota é calculada</h2>
+  <ul class="plain narrow">
+    <li><strong>Universo.</strong> Fundos imobiliários negociados em bolsa com patrimônio de pelo menos R$ 300 milhões e liquidez de pelo menos R$ 500 mil por dia. Fiagros e fundos de energia ou infraestrutura ficam de fora.</li>
+    <li><strong>Preço (25 pontos).</strong> Desconto sobre o valor patrimonial. Tijolo, fundos de fundos e híbridos: P/VP de 1,05 vale zero e 0,70 vale o máximo. Papel: 1,06 vale zero e 0,82 o máximo. P/VP abaixo de 0,55 perde metade dos pontos, porque desconto extremo costuma sinalizar problema.</li>
+    <li><strong>Renda (25).</strong> Dividend yield dos últimos 12 meses sobre a cotação (55%) e cobertura dos dividendos pelo resultado de caixa dos últimos 4 trimestres (45%). Em fundos de papel, DY acima de 13,5% perde pontos, porque costuma indicar crédito mais arriscado. DY acima de 16% perde metade.</li>
+    <li><strong>Qualidade (30).</strong> Passivo sobre ativo em todos os fundos. No tijolo, também vacância física, inadimplência, concentração no maior imóvel, número de imóveis e renda dos imóveis sobre o valor contábil (cap rate). No papel, também número de CRIs e concentração no maior; como a qualidade do crédito não aparece nos dados públicos, a nota de qualidade do papel é multiplicada por 0,85.</li>
+    <li><strong>Liquidez e base (10).</strong> Volume médio negociado por dia e número de cotistas.</li>
+    <li><strong>Custo (10).</strong> Taxa de administração mensal informada à CVM.</li>
+    <li><strong>Top 20.</strong> Os 20 de maior nota entre os elegíveis: liquidez de pelo menos R$ 1,5 milhão por dia, ao menos 15 mil cotistas, P/VP acima de 0,55, DY de até 20% e dividendo coberto em pelo menos 85% pelo resultado.</li>
+    <li><strong>Fontes.</strong> CVM, dados abertos (informes mensais e trimestrais dos FIIs); cotações e dividendos: mFinance, com Investidor10 para os fundos que ele não cobre. Referências de aluguel: Cushman &amp; Wakefield e JLL.</li>
+    <li><strong>Limites.</strong> O ranking olha o passado recente e dados contábeis. Não mede gestão, qualidade dos inquilinos ou do crédito, nem eventos posteriores ao último informe. Fundos recém-reorganizados podem ficar de fora por falta de cotação.</li>
+  </ul>
+</section>
+</main>
+
+<aside class="panel" id="panel" aria-live="polite" aria-label="Detalhe do fundo"></aside>
+
+<script>
+(async function(){
+  const nf0=new Intl.NumberFormat('pt-BR',{maximumFractionDigits:0}), nf1=new Intl.NumberFormat('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1}), nf2=new Intl.NumberFormat('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const dash='–', esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  async function load(name){ for(const base of ['', '../']){ try{ const r=await fetch(base+name); if(r.ok) return await r.json(); }catch(e){} } throw new Error(name); }
+  let D; try{ D=await load('data/fundos.json'); }catch(e){ document.getElementById('stamp').outerHTML='<p class="err">Não foi possível carregar os dados. Recarregue a página.</p>'; return; }
+  try{ const L=await load('links.json'); if(L&&L.mapa) document.getElementById('link-mapa').href=L.mapa; else throw 0; }catch(e){ if(location.pathname.indexOf('/ranking')<0) document.getElementById('link-mapa').closest('p').remove(); }
+  const F=D.fundos, dt=s=>s?s.split('-').reverse().join('/'):'';
+  document.getElementById('stamp').textContent=`Cotações de ${dt(D.meta.gerado)} · informes da CVM até ${dt(D.meta.cvm_mensal).slice(3)} (mensal) e ${dt(D.meta.cvm_trimestral)} (trimestral) · atualizado em ${D.meta.gerado_em}`;
+  const top=F.filter(f=>f.top).sort((a,b)=>a.top-b.top), eleg=F.filter(f=>f.eleg).length;
+  document.getElementById('lead').textContent=`${F.length} fundos imobiliários com patrimônio e liquidez mínimos, avaliados com dados oficiais da CVM e cotações de mercado. Cada fundo recebe uma nota de 0 a 100 em cinco critérios: preço, renda, qualidade, liquidez e custo.`;
+  document.getElementById('top-intro').textContent=`Escolhidos entre os ${eleg} fundos elegíveis (liquidez, número de cotistas e ausência de sinais de estresse). Clique em um fundo para ver a nota por critério e os alertas.`;
+  const mix={}; top.forEach(f=>mix[f.tipo]=(mix[f.tipo]||0)+1);
+  document.getElementById('mix').innerHTML=Object.entries(mix).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<span class="pill">${v} ${esc(k.toLowerCase())}</span>`).join('');
+  document.getElementById('topgrid').innerHTML=top.map(f=>`<button type="button" class="tcard" data-t="${f.t}"><span class="pos">${f.top}</span><span class="tk">${f.t}</span><span class="sc">${nf1.format(f.score)}</span><span class="sub">${esc(f.tipo)} · DY ${nf1.format(f.dy12)}% · P/VP ${nf2.format(f.pvp)}</span></button>`).join('');
+  document.getElementById('topgrid').addEventListener('click',e=>{const b=e.target.closest('[data-t]'); if(b) open(b.dataset.t);});
+
+  const P=(x,d=1)=>x==null?dash:(d===2?nf2:nf1).format(x)+'%';
+  const N=(x,d=2)=>x==null?dash:(d===0?nf0:d===1?nf1:nf2).format(x);
+  const M=x=>x==null?dash:(x>=1e9?nf1.format(x/1e9)+' bi':nf1.format(x/1e6)+' mi');
+  const cls=(x,good,badv,rev)=>x==null?'':(rev?(x<=good?'good':x>=badv?'bad':'mid'):(x>=good?'good':x<=badv?'bad':'mid'));
+  const SC=[['preco','Preço','var(--s1)',25],['renda','Renda','var(--s2)',25],['qualidade','Qualidade','var(--s3)',30],['liquidez','Liquidez','var(--s4)',10],['custo','Custo','var(--s5)',10]];
+  document.getElementById('legend').innerHTML='Barra da nota: '+SC.map(s=>`<span><i style="background:${s[2]}"></i>${s[1]} (${s[3]})</span>`).join('');
+  // columns: key, label, group, render, sortValue, right
+  const C=[
+    ['rank','#','base',f=>f.rank,f=>f.rank,1],
+    ['t','Fundo','base',f=>`<div class="tkcell"><b>${f.t}${f.top?' <span class="pill top">Top '+f.top+'</span>':''}</b><span title="${esc(f.nome)}">${esc(f.nome)}</span></div>`,f=>f.t,0,'stick'],
+    ['tipo','Tipo','base',f=>esc(f.tipo),f=>f.tipo],
+    ['seg','Segmento','base',f=>esc(f.seg||dash),f=>f.seg||''],
+    ['score','Nota','base',f=>`<div style="display:flex;gap:8px;align-items:center;justify-content:flex-end"><b>${nf1.format(f.score)}</b><span class="scorebar">${SC.map(s=>`<i style="width:${f.s[s[0]]}%;background:${s[2]}"></i>`).join('')}</span></div>`,f=>f.score,1],
+    ['preco','Cotação (R$)','preco',f=>N(f.preco),f=>f.preco,1],
+    ['vp','VP por cota (R$)','preco',f=>N(f.vp),f=>f.vp,1],
+    ['pvp','P/VP','preco',f=>`<span class="${cls(f.pvp,0.85,1.0,1)}">${N(f.pvp)}</span>`,f=>f.pvp,1],
+    ['dist_max52','Distância da máxima 12m','preco',f=>P(f.dist_max52),f=>f.dist_max52,1],
+    ['dy12','DY 12m','renda',f=>`<span class="${cls(f.dy12,11,8)}">${P(f.dy12)}</span>`,f=>f.dy12,1],
+    ['ult_div','Último dividendo (R$)','renda',f=>N(f.ult_div,2),f=>f.ult_div,1],
+    ['dy_ult_anual','Último div. anualizado','renda',f=>P(f.dy_ult_anual),f=>f.dy_ult_anual,1],
+    ['cob','Cobertura pelo resultado','renda',f=>`<span class="${cls(f.cob,1,0.9)}">${f.cob==null?dash:nf0.format(f.cob*100)+'%'}</span>`,f=>f.cob,1],
+    ['liq','Liquidez (R$/dia)','liq',f=>M(f.liq),f=>f.liq,1],
+    ['pl','Patrimônio (R$)','liq',f=>M(f.pl),f=>f.pl,1],
+    ['cotistas','Cotistas','liq',f=>N(f.cotistas,0),f=>f.cotistas,1],
+    ['alav','Passivo / ativo','risco',f=>`<span class="${cls(f.alav,10,25,1)}">${P(f.alav)}</span>`,f=>f.alav,1],
+    ['divida_pl','Dívida / patrimônio','risco',f=>P(f.divida_pl),f=>f.divida_pl,1],
+    ['taxa_adm','Taxa adm. (% a.m.)','risco',f=>f.taxa_adm==null?dash:nf2.format(f.taxa_adm)+'%',f=>f.taxa_adm,1],
+    ['pct_caixa','Caixa / ativo','risco',f=>P(f.pct_caixa),f=>f.pct_caixa,1],
+    ['n_imoveis','Imóveis','imov',f=>N(f.n_imoveis,0),f=>f.n_imoveis,1],
+    ['area','Área (mil m²)','imov',f=>f.area?nf0.format(f.area/1000):dash,f=>f.area,1],
+    ['vac_fis','Vacância física','imov',f=>`<span class="${cls(f.vac_fis,5,15,1)}">${P(f.vac_fis)}</span>`,f=>f.vac_fis,1],
+    ['inad','Inadimplência','imov',f=>`<span class="${cls(f.inad,1,5,1)}">${P(f.inad)}</span>`,f=>f.inad,1],
+    ['conc_max','Maior imóvel (% receita)','imov',f=>P(f.conc_max),f=>f.conc_max,1],
+    ['alug_m2','Aluguel médio (R$/m²/mês)','imov',f=>N(f.alug_m2),f=>f.alug_m2,1],
+    ['cap_contabil','Cap rate contábil','imov',f=>`<span class="${cls(f.cap_contabil,8,6.5)}">${P(f.cap_contabil)}</span>`,f=>f.cap_contabil,1],
+    ['cap_mercado','Cap rate a preço de mercado','imov',f=>P(f.cap_mercado),f=>f.cap_mercado,1],
+    ['pct_imoveis','Imóveis / ativo','cart',f=>P(f.pct_imoveis),f=>f.pct_imoveis,1],
+    ['pct_cri','CRI / ativo','cart',f=>P(f.pct_cri),f=>f.pct_cri,1],
+    ['pct_fii','Cotas de FII / ativo','cart',f=>P(f.pct_fii),f=>f.pct_fii,1],
+    ['n_cri','CRIs','cart',f=>N(f.n_cri,0),f=>f.n_cri,1],
+    ['conc_cri','Maior CRI (% da carteira)','cart',f=>P(f.conc_cri),f=>f.conc_cri,1],
+    ['s_preco','Preço (25)','nota',f=>nf1.format(f.s.preco),f=>f.s.preco,1],
+    ['s_renda','Renda (25)','nota',f=>nf1.format(f.s.renda),f=>f.s.renda,1],
+    ['s_qual','Qualidade (30)','nota',f=>nf1.format(f.s.qualidade),f=>f.s.qualidade,1],
+    ['s_liq','Liquidez (10)','nota',f=>nf1.format(f.s.liquidez),f=>f.s.liquidez,1],
+    ['s_custo','Custo (10)','nota',f=>nf1.format(f.s.custo),f=>f.s.custo,1],
+    ['alertas','Alertas','base',f=>f.alertas.length?`<span class="pill warn" title="${esc(f.alertas.join(' '))}">${f.alertas.length}</span>`:'',f=>f.alertas.length,1],
+  ];
+  const GROUPS=[['preco','Preço',1],['renda','Renda',1],['liq','Tamanho e liquidez',1],['risco','Dívida e custos',0],['imov','Imóveis e aluguéis',1],['cart','Carteira',0],['nota','Nota por critério',0]];
+  const gOn=Object.fromEntries(GROUPS.map(g=>[g[0],!!g[2]])); gOn.base=true;
+  document.getElementById('groups').innerHTML='<span class="small muted">Colunas:</span>'+GROUPS.map(g=>`<button type="button" class="btn" data-g="${g[0]}" aria-pressed="${!!g[2]}">${g[1]}</button>`).join('');
+  document.getElementById('groups').addEventListener('click',e=>{const b=e.target.closest('[data-g]'); if(!b) return; gOn[b.dataset.g]=!gOn[b.dataset.g]; b.setAttribute('aria-pressed',gOn[b.dataset.g]); render();});
+  let sortK='rank', sortD=1, sel=null;
+  const ft=document.getElementById('ftipo'), fs=document.getElementById('fseg');
+  [...new Set(F.map(f=>f.tipo))].sort().forEach(t=>ft.add(new Option(t,t)));
+  [...new Set(F.map(f=>f.seg).filter(Boolean))].sort().forEach(t=>fs.add(new Option(t,t)));
+  const ids=['q','ftipo','fseg','fdy','fpvp','fliq','fvac','ftop','feleg','fsemal'];
+  ids.forEach(id=>document.getElementById(id).addEventListener('input',render));
+  document.getElementById('limpar').onclick=()=>{ids.forEach(id=>{const el=document.getElementById(id); if(el.type==='checkbox') el.checked=false; else el.value='';}); render();};
+  const norm=s=>(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+  const val=id=>{const v=document.getElementById(id).value; return v===''?null:parseFloat(v);};
+  function filtered(){
+    const q=norm(document.getElementById('q').value.trim()), t=ft.value, s=fs.value, dy=val('fdy'), pvp=val('fpvp'), liq=val('fliq'), vac=val('fvac');
+    return F.filter(f=>(!q||norm(f.t+' '+f.nome+' '+f.adm).includes(q))&&(!t||f.tipo===t)&&(!s||f.seg===s)&&(dy==null||(f.dy12||0)>=dy)&&(pvp==null||(f.pvp||9)<=pvp)
+      &&(liq==null||f.liq>=liq*1e6)&&(vac==null||(f.vac_fis!=null&&f.vac_fis<=vac))&&(!document.getElementById('ftop').checked||f.top)&&(!document.getElementById('feleg').checked||f.eleg)&&(!document.getElementById('fsemal').checked||!f.alertas.length));
+  }
+  function render(){
+    const cols=C.filter(c=>gOn[c[2]]);
+    const col=C.find(c=>c[0]===sortK)||C[0];
+    const rows=filtered().sort((a,b)=>{let x=col[4](a),y=col[4](b); if(x==null&&y==null) return 0; if(x==null) return 1; if(y==null) return -1; return (typeof x==='string'?x.localeCompare(y,'pt'):x-y)*sortD;});
+    document.getElementById('count').textContent=`${rows.length} de ${F.length} fundos com os filtros atuais.`;
+    // group header
+    const spans=[]; cols.forEach(c=>{const g=c[2]; if(spans.length&&spans[spans.length-1][0]===g) spans[spans.length-1][1]++; else spans.push([g,1]);});
+    const gname=Object.fromEntries(GROUPS.map(g=>[g[0],g[1]])); gname.base='';
+    const thead=`<tr class="grp">${spans.map(([g,n],i)=>`<th colspan="${n}" class="${i===0?'':''}">${gname[g]||''}</th>`).join('')}</tr>
+      <tr class="col">${cols.map(c=>`<th class="${c[5]?'r':''} ${c[6]||''}" aria-sort="${sortK===c[0]?(sortD>0?'ascending':'descending'):'none'}"><button type="button" data-k="${c[0]}">${c[1]}${sortK===c[0]?(sortD>0?' ↑':' ↓'):''}</button></th>`).join('')}</tr>`;
+    document.querySelector('#tab thead').innerHTML=thead;
+    document.querySelector('#tab tbody').innerHTML=rows.map(f=>`<tr class="row${f.top?' istop':''}${sel===f.t?' sel':''}" data-t="${f.t}">${cols.map(c=>`<td class="${c[5]?'r':''} ${c[6]||''}">${c[3](f)}</td>`).join('')}</tr>`).join('');
+  }
+  document.querySelector('#tab thead').addEventListener('click',e=>{const b=e.target.closest('button[data-k]'); if(!b) return; const k=b.dataset.k; if(sortK===k) sortD=-sortD; else {sortK=k; sortD=['t','tipo','seg','rank','pvp','alav','vac_fis','inad','conc_max','taxa_adm','divida_pl','conc_cri','dist_max52'].includes(k)?1:-1;} render();});
+  document.querySelector('#tab tbody').addEventListener('click',e=>{const tr=e.target.closest('tr.row'); if(tr) open(tr.dataset.t);});
+  const panel=document.getElementById('panel');
+  function open(t){
+    const f=F.find(x=>x.t===t); sel=t; render();
+    const rows=[['Cotação',`R$ ${N(f.preco)}`],['Valor patrimonial por cota',`R$ ${N(f.vp)}`],['P/VP',N(f.pvp)],['DY 12 meses',P(f.dy12)],['Último dividendo',f.ult_div!=null?`R$ ${N(f.ult_div)} (${dt(f.ult_div_data)})`:dash],
+      ['Cobertura pelo resultado (4 tri)',f.cob==null?dash:nf0.format(f.cob*100)+'%'],['Liquidez diária',M(f.liq)],['Patrimônio',M(f.pl)],['Cotistas',N(f.cotistas,0)],['Passivo / ativo',P(f.alav)],['Taxa de administração',f.taxa_adm==null?dash:nf2.format(f.taxa_adm)+'% a.m.']];
+    if(f.area) rows.push(['Imóveis',`${f.n_imoveis} · ${nf0.format(f.area)} m²`],['Vacância física',P(f.vac_fis)],['Inadimplência',P(f.inad)],['Maior imóvel',P(f.conc_max)+' da receita'],['Aluguel médio',f.alug_m2!=null?'R$ '+N(f.alug_m2)+'/m²/mês':dash],['Cap rate contábil',P(f.cap_contabil)],['Cap rate a preço de mercado',P(f.cap_mercado)]);
+    if(f.n_cri) rows.push(['CRIs na carteira',N(f.n_cri,0)],['Maior CRI',P(f.conc_cri)+' da carteira']);
+    panel.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><h2>${f.t}</h2><p class="small muted">${esc(f.nome)}<br>${esc(f.tipo)} · ${esc(f.seg||'')} · ${esc(f.adm)}</p></div><button type="button" class="btn" id="close">Fechar</button></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${f.top?`<span class="pill top">Top 20 · ${f.top}º</span>`:''}<span class="pill">${f.rank}º de ${F.length} · nota ${nf1.format(f.score)}</span>${f.eleg?'':`<span class="pill bad">Fora do Top 20: ${esc(f.ineleg.join(', '))}</span>`}</div>
+      <div class="bars">${SC.map(s=>`<div class="bar"><span>${s[1]}</span><span class="track"><span class="fill" style="display:block;width:${f.s[s[0]]/s[3]*100}%;background:${s[2]}"></span></span><span class="val">${nf1.format(f.s[s[0]])} / ${s[3]}</span></div>`).join('')}</div>
+      ${f.alertas.length?`<div><h3>Alertas</h3><ul class="plain small">${f.alertas.map(a=>`<li>${esc(a)}</li>`).join('')}</ul></div>`:'<p class="small muted">Sem alertas nos critérios do ranking.</p>'}
+      <dl>${rows.map(r=>`<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('')}</dl>
+      <p class="small muted">Cotação: ${esc(f.fonte_preco)}. Dividendos: ${esc(f.fonte_div)}. Informe mensal de ${dt(f.data_cvm).slice(3)}; trimestral de ${dt(f.data_tri)}. CNPJ ${esc(f.cnpj)}.</p>`;
+    panel.classList.add('open'); document.getElementById('close').onclick=close; document.getElementById('close').focus();
+  }
+  function close(){ panel.classList.remove('open'); sel=null; render(); }
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('open')) close();});
+  render();
+})();
+</script>
+</body>
+</html>

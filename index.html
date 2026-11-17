@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa dos imóveis dos FIIs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: resumo calculado dos dados, mapa com painel de detalhe, lista de imóveis, cartões por fundo, método. */
+:root{
+  --bg:#f2f4f7; --surface:#ffffff; --ink:#15202b; --muted:#566573; --line:#d4dae1;
+  --accent:#2b4fa3; --accent-soft:#e3e9f6;
+  --land:#e6eaef; --land-line:#b3bdc8; --water:#f8fafc;
+  --ok:#1b7f55; --ok-soft:#dff2e8; --ap:#a86f00; --ap-soft:#faefd2; --du:#b93a30; --du-soft:#fae3e0; --na:#6b7785; --na-soft:#e7eaee;
+  --display:"Sora","Trebuchet MS",system-ui,sans-serif; --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ color-scheme:dark;
+    --bg:#10161d; --surface:#18212b; --ink:#e7edf3; --muted:#9aa9b8; --line:#2d3a47; --accent:#8fb0f5; --accent-soft:#1c2a45;
+    --land:#222e3a; --land-line:#465666; --water:#141c25;
+    --ok:#5fd09a; --ok-soft:#143326; --ap:#e8b64f; --ap-soft:#3a2e10; --du:#f28b80; --du-soft:#3f1d19; --na:#93a1b0; --na-soft:#26313c; }
+}
+:root[data-theme="dark"]{ color-scheme:dark;
+  --bg:#10161d; --surface:#18212b; --ink:#e7edf3; --muted:#9aa9b8; --line:#2d3a47; --accent:#8fb0f5; --accent-soft:#1c2a45;
+  --land:#222e3a; --land-line:#465666; --water:#141c25;
+  --ok:#5fd09a; --ok-soft:#143326; --ap:#e8b64f; --ap-soft:#3a2e10; --du:#f28b80; --du-soft:#3f1d19; --na:#93a1b0; --na-soft:#26313c; }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+main{max-width:1180px;margin:0 auto;padding:28px 18px 60px;display:flex;flex-direction:column;gap:36px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:clamp(1.6rem,4.5vw,2.3rem);letter-spacing:-.02em} h2{font-size:1.3rem} h3{font-size:1rem}
+p{margin:0} a{color:var(--accent)}
+section{display:flex;flex-direction:column;gap:14px}
+.narrow{max-width:72ch} .muted{color:var(--muted)} .small{font-size:.9rem}
+.pill{display:inline-flex;align-items:center;font-size:.8rem;font-weight:600;padding:2px 10px;border-radius:99px;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.ap{background:var(--ap-soft);color:var(--ap)} .pill.du{background:var(--du-soft);color:var(--du)} .pill.na{background:var(--na-soft);color:var(--na)}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.sum{background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.sum.ok{border-top-color:var(--ok)} .sum.ap{border-top-color:var(--ap)} .sum.du{border-top-color:var(--du)} .sum.na{border-top-color:var(--na)}
+.sum .big{font-family:var(--display);font-size:1.6rem;font-variant-numeric:tabular-nums}
+.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.controls label{font-weight:600;font-size:.9rem}
+select,button,input{font:inherit}
+select,input[type=search]{padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.btn{padding:6px 12px;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--ink);cursor:pointer;font-size:.9rem;font-weight:500}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.btn:hover{border-color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.group{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.mapwrap{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:14px;align-items:start}
+.mapbox{position:relative;background:var(--water);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+svg#map{display:block;width:100%;height:auto;touch-action:none;cursor:grab}
+.state{fill:var(--land);stroke:var(--land-line);stroke-width:1;vector-effect:non-scaling-stroke}
+.mun{fill:none;stroke:var(--land-line);stroke-width:.6;vector-effect:non-scaling-stroke;opacity:0;pointer-events:none}
+.zoomed .mun{opacity:.75}
+.slabel{font-family:var(--body);fill:var(--muted);text-anchor:middle;pointer-events:none;font-weight:600}
+.zoomed .slabel{display:none}
+.pt{stroke:var(--surface);stroke-width:1.2;cursor:pointer;opacity:.92;vector-effect:non-scaling-stroke}
+.pt.ok{fill:var(--ok)} .pt.ap{fill:var(--ap)} .pt.du{fill:var(--du)} .pt.na{fill:var(--na)}
+.pt.dim{opacity:.08;pointer-events:none} .pt.sel{stroke:var(--ink);stroke-width:3;opacity:1}
+.plabel{font-family:var(--body);font-weight:600;fill:var(--ink);paint-order:stroke;stroke:var(--surface);pointer-events:none}
+.zoombtns{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:6px}
+.zoombtns button{width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:1.2rem;font-weight:600;cursor:pointer}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:.82rem;padding:5px 9px;border-radius:6px;white-space:nowrap;transform:translate(-50%,-140%);display:none;z-index:2}
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;min-height:260px}
+.detail dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:.93rem}
+.detail dt{color:var(--muted)} .detail dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:.88rem;color:var(--muted);align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:6px} .legend svg{width:16px;height:16px}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface);max-height:540px}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{position:sticky;top:0;background:var(--surface);font-size:.8rem;color:var(--muted);font-weight:600;z-index:1;white-space:nowrap}
+th button{all:unset;cursor:pointer} th button:focus-visible{outline:3px solid var(--accent)}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.row{cursor:pointer} tr.row:hover td,tr.row.sel td{background:var(--accent-soft)}
+td button.link{background:none;border:0;padding:0;color:var(--accent);font-weight:600;cursor:pointer;text-align:left}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card.ok{border-left-color:var(--ok)} .card.ap{border-left-color:var(--ap)} .card.du{border-left-color:var(--du)} .card.na{border-left-color:var(--na)}
+.card header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.card .tk{font-family:var(--display);font-size:1.1rem}
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px}
+.metrics div{display:flex;flex-direction:column} .metrics .k{font-size:.75rem;color:var(--muted)} .metrics .v{font-weight:600;font-variant-numeric:tabular-nums}
+.card footer{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:.88rem}
+ul.plain{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+.note{border-top:1px solid var(--line);padding-top:16px}
+.err{background:var(--du-soft);color:var(--du);padding:12px 14px;border-radius:8px}
+@media (max-width:860px){ .mapwrap{grid-template-columns:1fr} .detail{min-height:0} }
+@media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+</style>
+</head>
+<body>
+<main>
+<header style="display:flex;flex-direction:column;gap:10px">
+  <p class="small muted" id="stamp">Carregando dados…</p>
+  <h1>Onde estão os imóveis dos fundos e se o valor atribuído se sustenta</h1>
+  <p class="narrow" id="lead"></p>
+  <p class="small"><a href="../ranking/" id="link-ranking">Ver o ranking dos fundos</a></p>
+</header>
+
+<section aria-labelledby="h-resumo">
+  <h2 id="h-resumo">O que os números mostram</h2>
+  <div class="summary" id="summary"></div>
+  <p class="narrow small muted">Leitura por critério objetivo, explicado no fim da página. Não é laudo de avaliação nem recomendação de investimento.</p>
+</section>
+
+<section aria-labelledby="h-mapa">
+  <h2 id="h-mapa">Mapa dos imóveis</h2>
+  <div class="controls">
+    <div class="group"><label for="fundo">Fundo</label><select id="fundo"><option value="all">Todos os fundos</option></select></div>
+    <div class="group"><label for="tipo">Tipo</label><select id="tipo"><option value="all">Todos</option></select></div>
+    <div class="group" role="group" aria-label="Filtrar por leitura" id="vfilter">
+      <button type="button" class="btn" data-v="ok" aria-pressed="true">Factível</button>
+      <button type="button" class="btn" data-v="ap" aria-pressed="true">Apertado</button>
+      <button type="button" class="btn" data-v="du" aria-pressed="true">Duvidoso</button>
+    </div>
+    <div class="group" role="group" aria-label="Ir para região">
+      <button type="button" class="btn" data-z="br">Brasil</button>
+      <button type="button" class="btn" data-z="gsp">Grande São Paulo</button>
+      <button type="button" class="btn" data-z="sp">São Paulo capital</button>
+      <button type="button" class="btn" data-z="rj">Rio de Janeiro</button>
+    </div>
+  </div>
+  <div class="mapwrap">
+    <div class="mapbox" id="mapbox">
+      <svg id="map" viewBox="0 0 900 820" role="img" aria-label="Mapa do Brasil com os imóveis dos fundos imobiliários"></svg>
+      <div class="zoombtns"><button type="button" id="zin" aria-label="Aproximar">+</button><button type="button" id="zout" aria-label="Afastar">−</button></div>
+      <div class="tip" id="tip"></div>
+    </div>
+    <aside class="detail" id="detail" aria-live="polite"></aside>
+  </div>
+  <div class="legend">
+    <span><svg viewBox="-8 -8 16 16"><circle r="6" fill="var(--ok)"/></svg>Factível</span>
+    <span><svg viewBox="-8 -8 16 16"><rect x="-5" y="-5" width="10" height="10" transform="rotate(45)" fill="var(--ap)"/></svg>Apertado</span>
+    <span><svg viewBox="-8 -8 16 16"><path d="M0,-7 L7,6 L-7,6 Z" fill="var(--du)"/></svg>Duvidoso</span>
+    <span>O tamanho do marcador acompanha a área. Arraste e use a roda do mouse para navegar.</span>
+  </div>
+  <p class="small muted narrow" id="geo-note"></p>
+</section>
+
+<section aria-labelledby="h-lista">
+  <h2 id="h-lista">Imóveis <span id="count" class="muted" style="font-family:var(--body);font-weight:400;font-size:1rem"></span></h2>
+  <div class="controls"><div class="group"><label for="busca">Buscar</label><input type="search" id="busca" placeholder="Nome, cidade ou endereço"></div></div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr id="thead"></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <p class="small muted narrow">Aluguel por m² estimado: receita de aluguel do fundo nos últimos 4 trimestres × participação do imóvel na receita ÷ 12 ÷ área ocupada. Não calculado para shoppings, cuja área informada é a do empreendimento inteiro. Clique em uma linha para ver o imóvel no mapa.</p>
+</section>
+
+<section aria-labelledby="h-fundos">
+  <h2 id="h-fundos">Fundo a fundo</h2>
+  <p class="narrow">O valor contábil dos imóveis é o do informe à CVM, baseado em laudo. A renda que ele gera por ano é o cap rate contábil. O cap rate a preço de mercado faz a mesma conta sobre o que a bolsa paga hoje pelos imóveis: valor das cotas mais dívidas, menos caixa e títulos.</p>
+  <div class="cards" id="cards"></div>
+</section>
+
+<section class="note" aria-labelledby="h-met">
+  <h2 id="h-met">Como a leitura foi feita</h2>
+  <ul class="plain narrow">
+    <li><strong>Fonte.</strong> Informe trimestral entregue por cada fundo à CVM (dados abertos), com área, vacância, inadimplência e participação de cada imóvel na receita. O valor dos imóveis vem do informe mensal. Cotações: mFinance e Investidor10.</li>
+    <li><strong>Leitura do fundo.</strong> Aluguel dos últimos 12 meses dividido pelo valor contábil dos imóveis. Factível com 8% ou mais; apertado entre 6,5% e 8%; duvidoso abaixo de 6,5%. A régua parte do juro real de cerca de 7,5% do Tesouro IPCA+ longo e do cap rate médio de cerca de 9,5% das transações de 2026. Sem leitura quando parte relevante dos imóveis está em sociedades, cujo aluguel não aparece como receita do fundo.</li>
+    <li><strong>Leitura do imóvel.</strong> Vacância acima de 30% ou inadimplência acima de 10%: duvidoso. Vacância entre 15% e 30%, inadimplência entre 3% e 10%, ou aluguel mais de 60% acima da referência de mercado: apertado. Imóvel de fundo com cap rate contábil abaixo de 6,5%: no máximo apertado.</li>
+    <li><strong>Referências de aluguel</strong> (preço pedido, R$/m²/mês): <span id="refs"></span>.</li>
+    <li><strong>Localização aproximada.</strong> Centro do município, ou de bairros conhecidos em São Paulo e no Rio, identificado a partir do endereço informado. Alguns endereços não trazem a cidade e ficam fora do mapa.</li>
+  </ul>
+</section>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+(async function(){
+  const VL={ok:'Factível',ap:'Apertado',du:'Duvidoso',na:'Sem leitura'};
+  const nf0=new Intl.NumberFormat('pt-BR',{maximumFractionDigits:0}), nf1=new Intl.NumberFormat('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1}), nf2=new Intl.NumberFormat('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const dash='–', esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  async function load(name){ for(const base of ['', '../']){ try{ const r=await fetch(base+name); if(r.ok) return await r.json(); }catch(e){} } throw new Error(name); }
+  let D,ST,SP,RJ;
+  try{ [D,ST,SP,RJ]=await Promise.all([load('data/imoveis.json'),load('geo/estados.json'),load('geo/sp_municipios.json'),load('geo/rj_municipios.json')]); }
+  catch(e){ document.getElementById('stamp').outerHTML='<p class="err">Não foi possível carregar os dados ('+esc(e.message)+'). Recarregue a página.</p>'; return; }
+  try{ const L=await load('links.json'); if(L&&L.ranking) document.getElementById('link-ranking').href=L.ranking; else throw 0; }catch(e){ if(location.pathname.indexOf('/mapa')<0) document.getElementById('link-ranking').closest('p').remove(); }
+  const props=D.props, funds=D.fundos, fmap=Object.fromEntries(funds.map(f=>[f.t,f]));
+  props.forEach((p,i)=>p.i=i);
+  const fv=f=>f.cap_contabil==null?'na':(f.cap_contabil>=8?'ok':(f.cap_contabil>=6.5?'ap':'du'));
+  funds.forEach(f=>{f.v=fv(f); f.mapa=props.filter(p=>p.f===f.t).length;});
+  const dt=s=>s?s.split('-').reverse().join('/'):'';
+  document.getElementById('stamp').textContent=`Dados da CVM até ${dt(D.meta.cvm_trimestral)} (imóveis) e ${dt(D.meta.cvm_mensal).slice(3)} (patrimônio) · cotações de ${dt(D.meta.gerado)} · atualizado em ${D.meta.gerado_em}`;
+  const cnt={ok:0,ap:0,du:0}; props.forEach(p=>cnt[p.v]++);
+  document.getElementById('lead').textContent=`O mapa mostra ${nf0.format(props.length)} imóveis de ${funds.length} fundos de tijolo, com área, vacância, inadimplência, participação na receita e aluguel por m². Cada imóvel é comparado com o aluguel de mercado da região, e cada fundo com a renda que seus imóveis geram sobre o valor contábil.`;
+  const byV=v=>funds.filter(f=>f.v===v).map(f=>f.t);
+  const sumBox=(v,title,txt)=>`<div class="sum ${v}"><span class="pill ${v}">${VL[v]}</span><span class="big">${v==='na'?byV('na').length+(byV('na').length===1?' fundo':' fundos'):nf0.format(cnt[v])+(cnt[v]===1?' imóvel':' imóveis')}</span><strong>${title}</strong><p class="small">${txt}</p></div>`;
+  document.getElementById('summary').innerHTML=
+    sumBox('ok','Ocupados, adimplentes e com aluguel compatível', `Fundos com renda de 8% ou mais sobre o valor contábil: ${byV('ok').join(', ')||'nenhum'}.`)+
+    sumBox('ap','Pontos de atenção', `Vacância ou inadimplência moderadas, aluguel acima do mercado ou fundo com renda entre 6,5% e 8% do valor contábil (${byV('ap').join(', ')||'nenhum'}).`)+
+    sumBox('du','Valor depende de alugar ou receber', `Vacância acima de 30% ou inadimplência acima de 10%. Fundos com renda abaixo de 6,5% do valor contábil: ${byV('du').join(', ')||'nenhum'}.`)+
+    sumBox('na','Fundos sem leitura de cap rate', `${byV('na').join(', ')||'nenhum'}: imóveis em sociedades ou receita incompleta no informe.`);
+  document.getElementById('refs').textContent=Object.entries(D.meta.refs).filter(([k])=>!k.startsWith('_')).map(([k,r])=>`${r.nome}: R$ ${nf2.format(r.valor)}`).join('; ');
+  document.getElementById('geo-note').textContent=`Posições aproximadas (centro do município ou de bairros conhecidos). ${nf0.format(props.filter(p=>p.prec==='bairro').length)} imóveis estão no nível de bairro e ${nf0.format(props.filter(p=>p.prec!=='bairro').length)} no centro do município.`;
+
+  let curFund='all',curTipo='all',curV=new Set(['ok','ap','du']),sel=null,K=1,q='',sortKey='area',sortDir=-1;
+  // ---------- map
+  const W=900,H=820, svg=d3.select('#map');
+  const proj=d3.geoMercator().fitExtent([[12,12],[W-12,H-12]],ST), path=d3.geoPath(proj), g=svg.append('g');
+  g.append('g').selectAll('path').data(ST.features).join('path').attr('class','state').attr('d',path);
+  g.append('g').selectAll('path').data(SP.features.concat(RJ.features)).join('path').attr('class','mun').attr('d',path);
+  const gl=g.append('g'); gl.selectAll('text').data(ST.features).join('text').attr('class','slabel').attr('font-size',11)
+    .attr('transform',d=>{const c=path.centroid(d);return `translate(${c[0]},${c[1]})`;}).attr('dy','.35em').text(d=>d.properties.sigla);
+  const SYM={ok:d3.symbolCircle,ap:d3.symbolDiamond,du:d3.symbolTriangle};
+  const rs=d3.scaleSqrt().domain([0,180000]).range([40,230]).clamp(true);
+  props.forEach(p=>{const xy=proj([p.lon,p.lat]);p.x=xy[0];p.y=xy[1];});
+  const pts=g.append('g').selectAll('path').data(props.slice().sort((a,b)=>(b.area||0)-(a.area||0))).join('path')
+    .attr('class',d=>'pt '+d.v).attr('d',d=>d3.symbol(SYM[d.v],rs(d.area||5000))()).attr('transform',d=>`translate(${d.x},${d.y})`)
+    .on('click',(e,d)=>select(d,false))
+    .on('mousemove',(e,d)=>{const r=document.getElementById('mapbox').getBoundingClientRect(),t=document.getElementById('tip');t.textContent=d.n+' · '+d.f;t.style.left=(e.clientX-r.left)+'px';t.style.top=(e.clientY-r.top)+'px';t.style.display='block';})
+    .on('mouseleave',()=>document.getElementById('tip').style.display='none');
+  const lab=g.append('text').attr('class','plabel').style('display','none');
+  const rm=matchMedia('(prefers-reduced-motion: reduce)').matches?0:600;
+  const zoom=d3.zoom().scaleExtent([1,900]).on('zoom',e=>{
+    g.attr('transform',e.transform); K=e.transform.k;
+    pts.attr('transform',d=>`translate(${d.x},${d.y}) scale(${1/K})`);
+    gl.selectAll('text').style('font-size',(11/K)+'px'); svg.classed('zoomed',K>=4); placeLabel();
+  });
+  svg.call(zoom);
+  function placeLabel(){ if(!sel){lab.style('display','none');return;} lab.style('display',null).attr('x',sel.x).attr('y',sel.y).style('font-size',(12/K)+'px').style('stroke-width',(4/K)+'px').attr('dx',12/K).attr('dy',4/K).text(sel.n); }
+  function fit(x0,y0,x1,y1){ const a=proj([x0,y1]),b=proj([x1,y0]); const k=Math.min(W/(b[0]-a[0]),H/(b[1]-a[1]))*0.92; svg.transition().duration(rm).call(zoom.transform,d3.zoomIdentity.translate(W/2-k*(a[0]+b[0])/2,H/2-k*(a[1]+b[1])/2).scale(k)); }
+  const REG={gsp:[-47.35,-24.0,-45.95,-22.95],sp:[-46.78,-23.68,-46.54,-23.46],rj:[-43.75,-23.08,-43.08,-22.72]};
+  document.querySelectorAll('[data-z]').forEach(b=>b.addEventListener('click',()=>{const r=REG[b.dataset.z]; if(!r) svg.transition().duration(rm).call(zoom.transform,d3.zoomIdentity); else fit(...r);}));
+  document.getElementById('zin').onclick=()=>svg.transition().duration(250).call(zoom.scaleBy,1.8);
+  document.getElementById('zout').onclick=()=>svg.transition().duration(250).call(zoom.scaleBy,1/1.8);
+
+  const pill=v=>`<span class="pill ${v}">${VL[v]}</span>`, place=p=>p.c+'/'+p.uf;
+  const norm=s=>(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+  const visible=p=>(curFund==='all'||p.f===curFund)&&(curTipo==='all'||p.tipo===curTipo)&&curV.has(p.v)&&(!q||norm(p.n+' '+p.end+' '+p.c+' '+p.f).includes(q));
+  const money=x=>x==null?dash:'R$ '+(x>=100?nf0.format(x):nf2.format(x));
+
+  function showDetail(){
+    const el=document.getElementById('detail');
+    if(!sel){
+      const vis=props.filter(visible), c={ok:0,ap:0,du:0}; vis.forEach(p=>c[p.v]++);
+      const f=curFund==='all'?null:fmap[curFund];
+      el.innerHTML=`<h3>${f?esc(f.t+' · '+f.nome):'Todos os fundos'}</h3><p class="small muted">${nf0.format(vis.length)} imóveis com os filtros atuais${f?`, de ${f.n_imoveis||vis.length} informados à CVM`:''}.</p>
+        <dl><dt>Factível</dt><dd>${c.ok}</dd><dt>Apertado</dt><dd>${c.ap}</dd><dt>Duvidoso</dt><dd>${c.du}</dd></dl>
+        ${f&&f.alertas&&f.alertas.length?`<p class="small">${esc(f.alertas.join(' '))}</p>`:''}
+        <p class="small muted">Clique em um marcador ou em uma linha da lista para ver o imóvel.</p>`;
+      return;
+    }
+    const p=sel,f=fmap[p.f];
+    const rows=[['Fundo',esc(p.f+' · '+f.nome)],['Local',esc(place(p))],['Endereço',esc(p.end)],['Tipo',esc(p.tipo)],['Área',p.area?nf0.format(p.area)+' m²':dash],
+      ['Vacância',nf1.format(p.vac)+'%'],['Inadimplência',nf1.format(p.inad)+'%'],['Parte da receita do fundo',p.prec_rec!=null?nf1.format(p.prec_rec)+'%':dash],
+      ['Aluguel estimado',p.alug!=null?money(p.alug)+'/m²/mês':dash],['Referência de mercado',p.ref!=null?money(p.ref)+'/m²':dash]];
+    el.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><h3>${esc(p.n)}</h3>${pill(p.v)}</div>
+      <dl>${rows.map(r=>`<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('')}</dl><p class="small">${esc(p.o)}</p>
+      <p class="small muted">Leitura do fundo: ${VL[f.v].toLowerCase()}${f.cap_contabil!=null?`, renda de ${nf1.format(f.cap_contabil)}% ao ano sobre o valor contábil`:''}. Informe de ${dt(f.data_tri)}.</p>
+      <div><button type="button" class="btn" id="clr">Fechar</button></div>`;
+    document.getElementById('clr').onclick=()=>select(null);
+  }
+  const COLS=[['n','Imóvel'],['f','Fundo'],['c','Local'],['tipo','Tipo'],['area','Área (m²)',1],['vac','Vacância',1],['inad','Inadimpl.',1],['prec_rec','% da receita',1],['alug','Aluguel (R$/m²)',1],['ref','Referência',1],['v','Leitura']];
+  function renderHead(){ document.getElementById('thead').innerHTML=COLS.map(([k,l,r])=>`<th class="${r?'r':''}" aria-sort="${sortKey===k?(sortDir>0?'ascending':'descending'):'none'}"><button type="button" data-k="${k}">${l}${sortKey===k?(sortDir>0?' ↑':' ↓'):''}</button></th>`).join(''); }
+  document.getElementById('thead').addEventListener('click',e=>{const b=e.target.closest('button'); if(!b) return; const k=b.dataset.k; if(sortKey===k) sortDir=-sortDir; else {sortKey=k; sortDir=['n','f','c','tipo'].includes(k)?1:-1;} renderRows();});
+  function renderRows(){
+    renderHead();
+    const order={ok:0,ap:1,du:2};
+    const vis=props.filter(visible).sort((a,b)=>{let x=a[sortKey],y=b[sortKey]; if(sortKey==='v'){x=order[x];y=order[y];} if(x==null) return 1; if(y==null) return -1; return (typeof x==='string'?x.localeCompare(y,'pt'):x-y)*sortDir;});
+    document.getElementById('count').textContent='· '+nf0.format(vis.length)+' de '+nf0.format(props.length);
+    document.getElementById('rows').innerHTML=vis.slice(0,600).map(p=>`<tr class="row${sel&&sel.i===p.i?' sel':''}" data-i="${p.i}"><td><button type="button" class="link">${esc(p.n)}</button></td><td>${p.f}</td><td>${esc(place(p))}</td><td>${esc(p.tipo)}</td>
+      <td class="r">${p.area?nf0.format(p.area):dash}</td><td class="r">${nf1.format(p.vac)}%</td><td class="r">${nf1.format(p.inad)}%</td><td class="r">${p.prec_rec!=null?nf1.format(p.prec_rec)+'%':dash}</td>
+      <td class="r">${p.alug!=null?(p.alug>=100?nf0.format(p.alug):nf2.format(p.alug)):dash}</td><td class="r">${p.ref!=null?(p.ref>=100?nf0.format(p.ref):nf2.format(p.ref)):dash}</td><td>${pill(p.v)}</td></tr>`).join('');
+  }
+  document.getElementById('rows').addEventListener('click',e=>{const tr=e.target.closest('tr.row'); if(!tr) return; select(props[+tr.dataset.i],true); document.getElementById('h-mapa').scrollIntoView({behavior:rm?'smooth':'auto',block:'start'});});
+  function refresh(){ pts.classed('dim',d=>!visible(d)).classed('sel',d=>sel&&d.i===sel.i); if(sel) pts.filter(d=>d.i===sel.i).raise(); placeLabel(); showDetail(); renderRows(); }
+  function select(p,zoomTo){ sel=p; if(p&&zoomTo){const k=Math.max(K,p.prec==='bairro'?260:40); svg.transition().duration(rm).call(zoom.transform,d3.zoomIdentity.translate(W/2-k*p.x,H/2-k*p.y).scale(k));} refresh(); }
+  function fitVisible(){ const v=props.filter(visible); if(!v.length||curFund==='all'){svg.transition().duration(rm).call(zoom.transform,d3.zoomIdentity);return;} const lo=d3.extent(v,p=>p.lon),la=d3.extent(v,p=>p.lat),px=Math.max(.15,(lo[1]-lo[0])*.18),py=Math.max(.15,(la[1]-la[0])*.18); fit(lo[0]-px,la[0]-py,lo[1]+px,la[1]+py); }
+  const selF=document.getElementById('fundo'), selT=document.getElementById('tipo');
+  funds.slice().sort((a,b)=>a.t.localeCompare(b.t)).forEach(f=>{const o=document.createElement('option');o.value=f.t;o.textContent=`${f.t} · ${f.nome} (${f.mapa})`;selF.appendChild(o);});
+  [...new Set(props.map(p=>p.tipo))].sort().forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;selT.appendChild(o);});
+  selF.onchange=()=>{curFund=selF.value;sel=null;refresh();fitVisible();};
+  selT.onchange=()=>{curTipo=selT.value;sel=null;refresh();};
+  document.getElementById('busca').oninput=e=>{q=norm(e.target.value.trim());refresh();};
+  document.querySelectorAll('#vfilter .btn').forEach(b=>b.onclick=()=>{const v=b.dataset.v; curV.has(v)?curV.delete(v):curV.add(v); b.setAttribute('aria-pressed',curV.has(v)); if(sel&&!visible(sel)) sel=null; refresh();});
+  // ---------- fund cards
+  const pct=(x,d=1)=>x==null?dash:(d===1?nf1:nf2).format(x)+'%';
+  document.getElementById('cards').innerHTML=funds.slice().sort((a,b)=>(b.score||0)-(a.score||0)).map(f=>{
+    const m=[['P/VP',f.pvp!=null?nf2.format(f.pvp):dash],['DY 12 meses',pct(f.dy12)],['Cap rate contábil',pct(f.cap_contabil)],['Cap rate a preço de mercado',pct(f.cap_mercado)],
+      ['Aluguel médio',f.alug_m2!=null?money(f.alug_m2)+'/m²':dash],['Vacância física',pct(f.vac_fis)],['Inadimplência',pct(f.inad)],['Imóveis / área',`${f.n_imoveis??dash} / ${f.area?nf0.format(f.area/1000)+' mil m²':dash}`]];
+    return `<article class="card ${f.v}"><header><div><div class="tk">${f.t}</div><div class="small muted">${esc(f.nome)} · ${esc(f.seg||'')}</div></div>${pill(f.v)}</header>
+      <div class="metrics">${m.map(x=>`<div><span class="k">${x[0]}</span><span class="v">${x[1]}</span></div>`).join('')}</div>
+      ${f.alertas&&f.alertas.length?`<p class="small">${esc(f.alertas.join(' '))}</p>`:'<p class="small muted">Sem alertas nos critérios do ranking.</p>'}
+      <footer><button type="button" class="btn" data-go="${f.t}">Ver ${f.mapa} no mapa</button><span class="muted">Nota ${f.score!=null?nf1.format(f.score):dash} · ${f.rank?f.rank+'º no ranking':''}${f.top?` · Top 20 (${f.top}º)`:''}</span></footer></article>`;
+  }).join('');
+  document.getElementById('cards').addEventListener('click',e=>{const b=e.target.closest('[data-go]'); if(!b) return; curFund=b.dataset.go; selF.value=curFund; sel=null; refresh(); fitVisible(); document.getElementById('h-mapa').scrollIntoView({block:'start'});});
+  refresh();
+})();
+</script>
+</body>
+</html>

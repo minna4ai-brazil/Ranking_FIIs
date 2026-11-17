@@ -1,0 +1,10 @@
+{
+  "galpao_sp": {"nome": "galpões de alto padrão, estado de SP (Cushman & Wakefield, 1T26)", "valor": 32.59},
+  "galpao_br": {"nome": "galpões de alto padrão, média nacional (Cushman & Wakefield, 1T26)", "valor": 28.94},
+  "esc_faria_lima": {"nome": "escritórios, Faria Lima (Cushman & Wakefield, 3T26)", "valor": 294.28},
+  "esc_jk": {"nome": "escritórios, JK e Itaim (Cushman & Wakefield, 3T26)", "valor": 284.05},
+  "esc_pinheiros": {"nome": "escritórios, Pinheiros (Cushman & Wakefield, 3T26)", "valor": 263.88},
+  "esc_chucri": {"nome": "escritórios, Chucri Zaidan (JLL, 1T25)", "valor": 101.0},
+  "esc_sp": {"nome": "escritórios de alto padrão, média de São Paulo (Cushman & Wakefield, 3T26)", "valor": 153.59},
+  "_atualizar": "Valores de anúncio (aluguel pedido) em R$/m²/mês. Revise a cada trimestre com os relatórios de mercado das consultorias."
+}

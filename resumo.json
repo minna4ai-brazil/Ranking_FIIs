@@ -1,0 +1,149 @@
+{
+ "gerado": "2026-11-17",
+ "cvm_mensal": "2026-10-01",
+ "cvm_trimestral": "2026-09-30",
+ "n": 88,
+ "top20": [
+  {
+   "t": "RBVA11",
+   "nota": 89.6,
+   "tipo": "Tijolo",
+   "dy": 13.79,
+   "pvp": 0.737
+  },
+  {
+   "t": "HFOF11",
+   "nota": 87.8,
+   "tipo": "Fundo de fundos",
+   "dy": 12.62,
+   "pvp": 0.763
+  },
+  {
+   "t": "JSAF11",
+   "nota": 85.5,
+   "tipo": "Fundo de fundos",
+   "dy": 14.92,
+   "pvp": 0.754
+  },
+  {
+   "t": "RECR11",
+   "nota": 84.4,
+   "tipo": "Papel",
+   "dy": 15.85,
+   "pvp": 0.781
+  },
+  {
+   "t": "KORE11",
+   "nota": 83.8,
+   "tipo": "Tijolo",
+   "dy": 15.49,
+   "pvp": 0.589
+  },
+  {
+   "t": "HSLG11",
+   "nota": 83.7,
+   "tipo": "Tijolo",
+   "dy": 12.15,
+   "pvp": 0.649
+  },
+  {
+   "t": "JSRE11",
+   "nota": 83.2,
+   "tipo": "Tijolo",
+   "dy": 10.17,
+   "pvp": 0.561
+  },
+  {
+   "t": "IRIM11",
+   "nota": 83.1,
+   "tipo": "Papel",
+   "dy": 13.17,
+   "pvp": 0.701
+  },
+  {
+   "t": "CVBI11",
+   "nota": 81.5,
+   "tipo": "Papel",
+   "dy": 12.53,
+   "pvp": 0.887
+  },
+  {
+   "t": "VRTA11",
+   "nota": 80.8,
+   "tipo": "Papel",
+   "dy": 15.45,
+   "pvp": 0.794
+  },
+  {
+   "t": "HGRE11",
+   "nota": 80.2,
+   "tipo": "Tijolo",
+   "dy": 10.28,
+   "pvp": 0.742
+  },
+  {
+   "t": "HGBS11",
+   "nota": 78.5,
+   "tipo": "Tijolo",
+   "dy": 11.05,
+   "pvp": 0.852
+  },
+  {
+   "t": "RBRR11",
+   "nota": 77.7,
+   "tipo": "Papel",
+   "dy": 15.68,
+   "pvp": 0.677
+  },
+  {
+   "t": "VILG11",
+   "nota": 77.4,
+   "tipo": "Tijolo",
+   "dy": 10.76,
+   "pvp": 0.806
+  },
+  {
+   "t": "HGCR11",
+   "nota": 77.2,
+   "tipo": "Papel",
+   "dy": 13.66,
+   "pvp": 0.881
+  },
+  {
+   "t": "HGLG11",
+   "nota": 76.3,
+   "tipo": "Tijolo",
+   "dy": 9.31,
+   "pvp": 0.868
+  },
+  {
+   "t": "KNHF11",
+   "nota": 75.8,
+   "tipo": "Papel",
+   "dy": 13.84,
+   "pvp": 0.885
+  },
+  {
+   "t": "HGRU11",
+   "nota": 75.5,
+   "tipo": "Tijolo",
+   "dy": 10.36,
+   "pvp": 0.884
+  },
+  {
+   "t": "KNIP11",
+   "nota": 75.2,
+   "tipo": "Papel",
+   "dy": 11.63,
+   "pvp": 0.926
+  },
+  {
+   "t": "CPSH11",
+   "nota": 75.1,
+   "tipo": "Híbrido",
+   "dy": 15.86,
+   "pvp": 0.801
+  }
+ ],
+ "faltando_preco": []
+}
